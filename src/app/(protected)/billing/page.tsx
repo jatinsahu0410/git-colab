@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { api } from "@/trpc/react";
-import dropin, { Dropin } from "braintree-web-drop-in";
 import { toast } from "sonner";
 import useRefresh from "@/hooks/useRefresh";
 
@@ -14,83 +12,89 @@ const Billing = () => {
     const { data: user } = api.project.getMyCredits.useQuery();
     const [creditsToBuy, setCreditsToBuy] = useState<number[]>([100]);
     const creditsToBuyAmount = creditsToBuy[0]!;
-    const price = (creditsToBuyAmount / 10).toFixed(2);
+    const price = (creditsToBuyAmount / 10).toFixed(0);
     const refetch = useRefresh();
+    const [loading, setLoading] = useState(false);
 
-    const [clientToken, setClientToken] = useState<string | null>(null);
-    const [dropinInstance, setDropinInstance] = useState<Dropin | null>(null);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"card" | "paypal" | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // Function to dynamically load the Razorpay script
+    const loadRazorpayScript = (): Promise<boolean> => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js"; // Razorpay CDN
+            script.async = true;
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
 
-    useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const res = await fetch("/api/braintree/token");
-                const data = await res.json();
-                if (!res.ok || !data.clientToken) {
-                    throw new Error("Failed to fetch the Braintree token.");
-                }
-                setClientToken(data.clientToken);
-            } catch (error) {
-                console.error("Token fetch error:", error);
-                toast.error("Unable to connect to payment service.");
-            }
-        };
-        fetchToken();
-    }, []);
-
-    useEffect(() => {
-        if (clientToken && selectedPaymentMethod) {
-            if (dropinInstance) {
-                dropinInstance.teardown(); // Cleanup previous instance
-            }
-            dropin.create(
-                {
-                    authorization: clientToken,
-                    container: "#dropin-container",
-                    paypal: selectedPaymentMethod === "paypal" ? { flow: "checkout" } : undefined,
-                    card: selectedPaymentMethod === "card" ? { cardholderName: true } : undefined,
-                },
-                (err, instance) => {
-                    if (err) {
-                        console.error("Drop-in Error:", err);
-                        toast.error("Payment setup failed.");
-                        return;
-                    }
-                    setDropinInstance(instance!);
-                }
-            );
-        }
-    }, [clientToken, selectedPaymentMethod]);
-
-    const handleBuyCredits = async () => {
-        if (!dropinInstance) {
-            toast.error("Payment not initialized.");
-            return;
-        }
+    // Handle payment process
+    const handlePayment = async () => {
+        setLoading(true);
 
         try {
-            const { nonce } = await dropinInstance.requestPaymentMethod();
-            const response = await fetch("/api/braintree/checkout", {
+            // Load Razorpay script dynamically
+            const isRazorpayLoaded = await loadRazorpayScript();
+            if (!isRazorpayLoaded) {
+                toast.error("Failed to load Razorpay. Please try again.");
+                setLoading(false);
+                return;
+            }
+
+            // Create the order on your backend
+            const res = await fetch("/api/razorpay/capturepayment", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    paymentMethodNonce: nonce,
-                    amount: price,
-                }),
+                body: JSON.stringify(price),
+                headers: {
+                    "Content-Type": "application/json",
+                },
             });
 
-            const result = await response.json();
-            if (response.ok) {
-                toast.success("Payment successful!");
-                refetch();
-                setIsModalOpen(false);
-            } else {
-                throw new Error(result.message || "Payment failed.");
+            const { order } = await res.json();
+            // the order created is 
+            console.log("The order is : ", order);
+            if (!order) {
+                toast.error("Order creation failed");
+                throw new Error("Failed to create order");
             }
+
+            // Razorpay options
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
+                amount: order.amount,
+                currency: order.currency,
+                name: "Git-Colab",
+                description: "Purchase credits to use in the website",
+                order_id: order.id,
+                handler: async (response: any) => {
+                    console.log("The response is : ", {response, creditsToBuyAmount});
+                    // Verify payment
+                    const verifyRes = await fetch("/api/razorpay/verify-payment", {
+                        method: "POST",
+                        body: JSON.stringify({response, creditsToBuyAmount}),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    const data = await verifyRes.json();
+                    console.log("The verify payment is : ", data);
+                    if (verifyRes.ok) {
+                        toast.success(`Payment successful! ${creditsToBuyAmount} credits added.`);
+                        refetch();
+                    } else {
+                        throw new Error("Payment verification failed");
+                    }
+                },
+            };
+
+            const razorpay = new (window as any).Razorpay(options);
+            razorpay.open();
         } catch (error) {
-            console.error("Payment processing error:", error);
+            console.error("Error:", error);
             toast.error("Payment failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -100,6 +104,7 @@ const Billing = () => {
             <p className="text-sm text-gray-500">
                 You currently have <strong className="text-black">{user?.credits}</strong> credits.
             </p>
+            <div className="h-2"></div>
             <div className="bg-blue-50 px-4 py-2 rounded-md text-blue-700 border-blue-300">
                 <div className="flex items-center gap-2">
                     <Info className="size-4" />
@@ -107,6 +112,7 @@ const Billing = () => {
                 </div>
                 <p className="text-sm">E.g: 100 files require 100 credits.</p>
             </div>
+            <div className="h-4"></div>
             <Slider
                 defaultValue={[100]}
                 max={1500}
@@ -115,39 +121,10 @@ const Billing = () => {
                 onValueChange={setCreditsToBuy}
                 value={creditsToBuy}
             />
-            <p className="text-lg font-semibold mb-2">Buy {creditsToBuyAmount} credits for Rs. {price}/-</p>
-
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                    <Button>Proceed to Payment</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Choose Payment Method</DialogTitle>
-                    </DialogHeader>
-
-                    <div className="flex gap-4 mb-4">
-                        <Button
-                            variant={selectedPaymentMethod === "card" ? "default" : "outline"}
-                            onClick={() => setSelectedPaymentMethod("card")}
-                        >
-                            Pay with Card
-                        </Button>
-                        <Button
-                            variant={selectedPaymentMethod === "paypal" ? "default" : "outline"}
-                            onClick={() => setSelectedPaymentMethod("paypal")}
-                        >
-                            Pay with PayPal
-                        </Button>
-                    </div>
-
-                    {selectedPaymentMethod && <div id="dropin-container" className="mb-4"></div>}
-
-                    <Button onClick={handleBuyCredits} disabled={!dropinInstance}>
-                        Confirm Payment
-                    </Button>
-                </DialogContent>
-            </Dialog>
+            <div className="h-4"></div>
+            <Button onClick={handlePayment} disabled={loading}>
+                {loading ? "Processing..." : `Buy ${creditsToBuyAmount} credits for $${price}`}
+            </Button>
         </div>
     );
 };
