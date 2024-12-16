@@ -1,6 +1,6 @@
 'use client'
 
-import MeetingCard from '@/app/_components/MeetingCard';
+import MeetingCard from '@/_components/MeetingCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import useProject from '@/hooks/useProject'

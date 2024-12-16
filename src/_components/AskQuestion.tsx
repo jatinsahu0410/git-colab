@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import useProject from '@/hooks/useProject'
 import Image from 'next/image';
 import React, { useState } from 'react'
-import { askQuestion } from '../action/respondQuestion';
+import { askQuestion } from '../app/action/respondQuestion';
 import { readStreamableValue } from 'ai/rsc';
 import CodeReference from "./Code-references";
 import { api } from "@/trpc/react";

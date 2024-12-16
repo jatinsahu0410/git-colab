@@ -1,6 +1,6 @@
 'use client'
-import AskQuestion from '@/app/_components/AskQuestion';
-import CodeReference from '@/app/_components/Code-references';
+import AskQuestion from '@/_components/AskQuestion';
+import CodeReference from '@/_components/Code-references';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import useProject from '@/hooks/useProject'
 import { api } from '@/trpc/react';
