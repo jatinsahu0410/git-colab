@@ -1,6 +1,6 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+import React from 'react'
 import ArchiveButton from '@/_components/archive-button';
 import AskQuestion from '@/_components/AskQuestion';
 import CommitLoges from '@/_components/commit-loges';
@@ -10,7 +10,6 @@ import TeamMembers from '@/_components/team-members';
 import useProject from '@/hooks/useProject'
 import { CatIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react'
 
 const Dashboard = () => {
   const { project } = useProject();
