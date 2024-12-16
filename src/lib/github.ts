@@ -103,11 +103,11 @@ export const pollCommits = async (projectId: string) => {
             // console.log("The summary is : ")
             return {
                 projectId: projectId,
-                commitHash: unprocessCommit[index]?.commitHash,
-                commitMessage: unprocessCommit[index]?.commitMessage,
-                commitAuthorName: unprocessCommit[index]?.commitAuthorName,
-                commitAuthorAvatar: unprocessCommit[index]?.commitAuthorAvatar,
-                commitDate: unprocessCommit[index]?.commitDate,
+                commitHash: unprocessCommit[index]?.commitHash!,
+                commitMessage: unprocessCommit[index]?.commitMessage!,
+                commitAuthorName: unprocessCommit[index]?.commitAuthorName!,
+                commitAuthorAvatar: unprocessCommit[index]?.commitAuthorAvatar!,
+                commitDate: unprocessCommit[index]?.commitDate!,
                 summary:summary,
             }
         },
