@@ -1,4 +1,5 @@
 'use client'
+
 import MeetingCard from '@/app/_components/MeetingCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
