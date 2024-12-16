@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Info } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
