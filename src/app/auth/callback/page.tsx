@@ -14,7 +14,6 @@ const Callback = async () => {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     if (!user.emailAddresses[0]?.emailAddress) {
-        // console.log("The notfound page: ");
         return notFound()
     }
 

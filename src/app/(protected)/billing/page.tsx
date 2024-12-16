@@ -69,11 +69,11 @@ const Billing = () => {
                 description: "Purchase credits to use in the website",
                 order_id: order.id,
                 handler: async (response: any) => {
-                    console.log("The response is : ", {response, creditsToBuyAmount});
+                    console.log("The response is : ", { response, creditsToBuyAmount });
                     // Verify payment
                     const verifyRes = await fetch("/api/razorpay/verify-payment", {
                         method: "POST",
-                        body: JSON.stringify({response, creditsToBuyAmount}),
+                        body: JSON.stringify({ response, creditsToBuyAmount }),
                         headers: {
                             "Content-Type": "application/json",
                         },
@@ -91,8 +91,11 @@ const Billing = () => {
                 },
             };
 
-            const razorpay = new (window as any).Razorpay(options);
-            razorpay.open();
+            if (typeof window !== "undefined") {
+                // Client-side-only code here
+                const razorpay = new (window as any).Razorpay(options);
+                razorpay.open();
+            }
         } catch (error) {
             console.error("Error:", error);
             toast.error("Payment failed. Please try again.");
