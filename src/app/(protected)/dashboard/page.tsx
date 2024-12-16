@@ -1,12 +1,12 @@
 "use client";
 
 import React from 'react'
-import ArchiveButton from '@/_components/archive-button';
-import AskQuestion from '@/_components/AskQuestion';
-import CommitLoges from '@/_components/commit-loges';
-import InviteButton from '@/_components/invite-button';
-import MeetingCard from '@/_components/MeetingCard';
-import TeamMembers from '@/_components/team-members';
+import ArchiveButton from '@/components/global/archive-button';
+import AskQuestion from '@/components/global/AskQuestion';
+import CommitLoges from '@/components/global/commit-loges';
+import InviteButton from '@/components/global/invite-button';
+import MeetingCard from '@/components/global/MeetingCard';
+import TeamMembers from '@/components/global/team-members';
 import useProject from '@/hooks/useProject'
 import { CatIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
