@@ -1,4 +1,4 @@
-'use client'
+"use client";
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import ArchiveButton from '@/_components/archive-button';
