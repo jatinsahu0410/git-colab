@@ -23,6 +23,7 @@ model User {
     credits       Int             @default(150)
     userToProject UserToProject[]
     questionAsked Question[]
+    Transactions  Transactions[]
 }
 
 model Project {
@@ -37,6 +38,7 @@ model Project {
     sourcecodeEmbedding sourcecodeEmbedd[]
     savedQuestion       Question[]
     meetings            Meeting[]
+    transactions        Transactions[]
 }
 
 model UserToProject {
@@ -124,6 +126,18 @@ model Issue {
 
     meetingId String
     meeting   Meeting @relation(fields: [meetingId], references: [id])
+}
+
+model Transactions {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @unique
+
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    credits   Int
+    Project   Project? @relation(fields: [projectId], references: [id])
+    projectId String?
 }
 
 enum MeetingStatus {

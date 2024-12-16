@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import useRefresh from "@/hooks/useRefresh";
+import { useRouter } from "next/navigation";
 
 const Billing = () => {
     const { data: user } = api.project.getMyCredits.useQuery();
@@ -15,6 +16,7 @@ const Billing = () => {
     const price = (creditsToBuyAmount / 10).toFixed(0);
     const refetch = useRefresh();
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     // Function to dynamically load the Razorpay script
     const loadRazorpayScript = (): Promise<boolean> => {
@@ -82,6 +84,7 @@ const Billing = () => {
                     if (verifyRes.ok) {
                         toast.success(`Payment successful! ${creditsToBuyAmount} credits added.`);
                         refetch();
+                        router.push('/create');
                     } else {
                         throw new Error("Payment verification failed");
                     }
