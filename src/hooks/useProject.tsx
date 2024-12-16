@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { api } from "@/trpc/react";
-import React from "react";
+'use client'
+
+import { api } from "@/trpc/react";;
 import { useLocalStorage } from "usehooks-ts"
 const useProject = () => {
     const { data: projects } = api.project.getProjects.useQuery();
