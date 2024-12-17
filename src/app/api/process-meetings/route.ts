@@ -9,7 +9,7 @@ const bodyParser = z.object({
     meetingId: z.string()
 });
  
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
     const user = currentUser();
