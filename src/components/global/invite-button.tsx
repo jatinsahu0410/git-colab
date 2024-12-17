@@ -10,6 +10,12 @@ import { toast } from 'sonner';
 const InviteButton = () => {
     const { projectId } = useProject();
     const [open, setOpen] = useState(false);
+    const [copy, setCopy] = useState('')
+    const handleCopy = () => {
+        navigator.clipboard.writeText(`${window.location.origin}/join/${projectId}`)
+        setCopy(`${window.location.origin}/join/${projectId}`)
+        toast.success("Copied to clipboard");
+    }
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -25,15 +31,12 @@ const InviteButton = () => {
                     <Input
                         className='mt-4'
                         readOnly
-                        onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/join/${projectId}`)
-                            toast.success("Copied to clipboard");
-                        }}
-                        value={`${window.location.origin}/join/${projectId}`}
+                        onClick={handleCopy}
+                        value={copy}
                     />
                 </DialogContent>
             </Dialog>
-            <Button size='sm' onClick={() =>setOpen(true)}>Invite Member</Button>
+            <Button size='sm' onClick={() => setOpen(true)}>Invite Member</Button>
         </>
     )
 }
