@@ -35,7 +35,6 @@ const Callback = async () => {
             lastName: user.lastName,
         }
     })
-    // console.log("The callback hit : ");
-    return redirect('/')
+    return redirect('/dashboard');
 }
 export default Callback;
