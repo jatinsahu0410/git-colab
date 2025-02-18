@@ -16,7 +16,7 @@ const Callback = async () => {
     if (!user.emailAddresses[0]?.emailAddress) {
         return notFound()
     }
-
+    
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     await db.user.upsert({
         where: {
