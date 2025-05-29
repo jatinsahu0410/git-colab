@@ -4,6 +4,7 @@ import { createStreamableValue } from "ai/rsc"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { generateEmbeddings } from "@/lib/gemini";
 import { db } from "@/server/db";
+import { auth } from "@clerk/nextjs/server";
 
 const google = createGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -15,6 +16,16 @@ export async function askQuestion(question: string, projectId: string) {
     const queryVector = await generateEmbeddings(question);
     const vectorQuery = `[${queryVector.join(',')}]`;
 
+    if (vectorQuery.length !== 0) {
+        const { userId } = await auth();
+        // have to decreament the credits 
+        if (userId) {
+            await db.user.update({
+                where: { id: userId! },
+                data: { credits: { decrement: 10 } }
+            });
+        }
+    }
     // fetch all the page embeddings 
     const result = await db.$queryRaw`
     SELECT "fileName", "sourceCode", "summary",
@@ -65,7 +76,7 @@ export async function askQuestion(question: string, projectId: string) {
             `
         });
 
-        for await (const chunk of textStream){
+        for await (const chunk of textStream) {
             stream.update(chunk);
         }
 

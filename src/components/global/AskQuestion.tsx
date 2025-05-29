@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 import useProject from '@/hooks/useProject'
 import Image from 'next/image';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { askQuestion } from '../../app/action/respondQuestion';
 import { readStreamableValue } from 'ai/rsc';
 import CodeReference from './Code-references';
@@ -32,6 +32,9 @@ function AskQuestion() {
         setLoading(true);
 
         const { output, fileRefrences } = await askQuestion(question!, project.id);
+        if(output){
+            toast.success('10 credits deducted for this question');
+        }
         setFileRefrences(fileRefrences)
         setOpen(true);
 
@@ -41,9 +44,17 @@ function AskQuestion() {
                 setAnswer(answer => answer + chunk);
             }
         }
-        setQuestion('');
+        // setQuestion(''); 
         setLoading(false);
     }
+    useEffect(() => {
+        if(!open){
+            setQuestion('');
+            setAnswer('');
+            setFileRefrences([]);
+        }
+    }, [open]);
+    
     const refetch = useRefresh();
     return (
         <>
@@ -73,6 +84,7 @@ function AskQuestion() {
                             }}>Save Answer</Button>
                         </div>
                     </DialogHeader>
+                    <h1 className='text-lg font-semibold text-gray-700'>{question}</h1>
                     <MarkdownEditor.Markdown
                         source={answer}
                         className="custom-markdown px-4 rounded-md  max-h-[40vh] overflow-y-scroll"
@@ -91,7 +103,7 @@ function AskQuestion() {
             <Card className='relative col-span-3'>
                 <CardHeader>
                     <CardTitle>
-                        Ask @ Question
+                        Ask @ Question <span className='text-sm text-green-400'>[Charged 10 credits each question]</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
