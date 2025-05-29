@@ -92,12 +92,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #007bff; /* Blue thumb */
+  background: #17A34A; /* Blue thumb */
   border-radius: 10px; /* Smooth rounded edges */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0056b3; /* Darker blue on hover */
+  background: #17A34A; /* Darker blue on hover */
 }
 
 ::-webkit-scrollbar-track {
@@ -108,7 +108,7 @@
 /* For Firefox */
 * {
   scrollbar-width: thin; /* Thin scrollbar */
-  scrollbar-color: #007bff #e3f2fd; /* Thumb and track colors */
+  scrollbar-color: #17A34A #e3f2fd; /* Thumb and track colors */
 }
 
 .no-scrollbar::-webkit-scrollbar {

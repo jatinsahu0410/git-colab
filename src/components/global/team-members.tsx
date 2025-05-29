@@ -12,7 +12,9 @@ const TeamMembers = () => {
         <div className='flex items-center gap-2'>
             {
                 members?.map(member => (
-                    <Image key={member.id} src={member.user.imageUrl || ""} alt={member.user.firstName || ''} height={30} width={30} className='rounded-full' />
+                    <div className='min-w-50 min-h-50 rounded-full shadow-lg shadow-emerald-300'>
+                        <Image key={member.id} src={member.user.imageUrl || ""} alt={member.user.firstName || ''} height={42} width={42} className='rounded-full' />
+                    </div>
                 ))
             }
         </div>

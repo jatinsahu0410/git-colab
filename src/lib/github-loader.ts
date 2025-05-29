@@ -13,11 +13,16 @@ const getFileCount = async (
     githubRepo: string,
     acc: number = 0
 ) => {
+    console.log("The path is : ", path);
+    console.log("The github owner is : ", githubOwner);
+    console.log("The github repo is : ", githubRepo);
     const { data } = await octokit.rest.repos.getContent({
         owner: githubOwner,
         repo: githubRepo,
         path
     });
+
+    console.log("The data is : ", data);
 
     if (!Array.isArray(data) && data.type === 'file') {
         return acc + 1;
@@ -59,6 +64,7 @@ export const checkCredits = async (githubUrl: string, githubToken?: string) => {
     const githubOwner = githubUrl.split('/')[3];
     const githubRepo = githubUrl.split('/')[4];
     if (!githubOwner || !githubRepo) return 0;
+    console.log("The check credit function called at githun-loader,ts");
 
     const fileCount = await getFileCount('', octokit, githubOwner, githubRepo, 0);
     return fileCount;

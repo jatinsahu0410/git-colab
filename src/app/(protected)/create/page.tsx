@@ -83,7 +83,7 @@ const CreatePoject = () => {
               <div className="h-2"></div>
               <Input
                 {...register('githubToken')}
-                placeholder='Github Token (Options) if repo is private'
+                placeholder='Github Token (Optional) if repo is private'
               />
               {
                 !!creditRequired.data && (
